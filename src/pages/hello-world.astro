@@ -1,0 +1,38 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SingleArticle from "../components/SingleArticle.astro";
+import { formatPageTitle, getPostPage } from "../lib/posts";
+import type { PostMetadata } from "../lib/posts";
+
+export const metadata: PostMetadata = {
+  title: "hello world",
+  date: "2026-09-17",
+  kind: "single",
+  cover: "/images/hello-world.jpg",
+};
+
+const { post, draftRedirect } = getPostPage(metadata, Astro.redirect);
+if (draftRedirect) {
+  return draftRedirect;
+}
+---
+
+<BaseLayout title={formatPageTitle(post)}>
+  <SingleArticle post={post}>
+    <p>
+      While sitting around trying to recover from a recent bike injury, I
+      thought it'd be fun to have a spot to write down some of my thoughts on
+      the process. Then I thought it'd also be interesting to write up the
+      journey I had training for the 2026 Marji Gesick bike race.
+    </p>
+    <p>
+      But where? There are various social media platforms these days, that was
+      my starting point. A stubborn part of me wants to fight against the
+      <a href="https://en.wikipedia.org/wiki/Dead_Internet_theory"
+        >dead internet theory</a
+      >
+      and bring back the blog. I don't know how often I will update, but it feels
+      good to have a starting point.
+    </p>
+  </SingleArticle>
+</BaseLayout>

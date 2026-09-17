@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getPostsByNewest } from '../data/posts';
+import { formatPostDate, siteTitle } from '../lib/posts';
+
+const postsByNewest = await getPostsByNewest();
+---
+
+<BaseLayout title={siteTitle}>
+  <h1 class="sr-only">Eric Butera Blog</h1>
+  <section class="project-grid" aria-label="Posts">
+    {
+      postsByNewest.map((post) => (
+        <a class="project-card" href={post.href}>
+          <img src={post.cover} alt="" />
+          <h2>
+            {post.title}
+            {post.draft && <span class="draft-label">Draft</span>}
+          </h2>
+          <time datetime={post.date}>{formatPostDate(post.date)}</time>
+        </a>
+      ))
+    }
+  </section>
+</BaseLayout>

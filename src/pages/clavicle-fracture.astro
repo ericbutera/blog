@@ -1,0 +1,118 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ArticleGallery from "../components/ArticleGallery.astro";
+import Timeline from "../components/Timeline.astro";
+import TimelineItem from "../components/TimelineItem.astro";
+import { icon } from "@fortawesome/fontawesome-svg-core";
+import { faStrava } from "@fortawesome/free-brands-svg-icons";
+import { faHospital, faRobot, faXRay } from "@fortawesome/free-solid-svg-icons";
+import { formatPageTitle, getPostPage } from "../lib/posts";
+import type { PostMetadata } from "../lib/posts";
+
+export const metadata: PostMetadata = {
+  title: "Mildly Displaced Midclavicular Fractur",
+  date: "2026-09-14",
+  kind: "gallery",
+  cover: "/images/clavicle/initial.jpg",
+  draft: false,
+};
+
+const { post, draftRedirect } = getPostPage(metadata, Astro.redirect);
+if (draftRedirect) {
+  return draftRedirect;
+}
+
+const stravaIcon = icon(faStrava).html.join("");
+const hospitalIcon = icon(faHospital).html.join("");
+const xrayIcon = icon(faXRay).html.join("");
+const robotIcon = icon(faRobot).html.join("");
+---
+
+<BaseLayout title={formatPageTitle(post)}>
+  <ArticleGallery
+    post={post}
+    contentFirst
+    imageSlides={[
+      {
+        imageSrc: "/images/clavicle/triage.jpg",
+        caption: "Triage - I am not a doctor, but I think it's broken.",
+      },
+      {
+        imageSrc: "/images/clavicle/initial.jpg",
+        caption: "Fracture confirmed.",
+      },
+      {
+        imageSrc: "/images/clavicle/fracture-2weeks.jpg",
+        caption: "Fracture - 2 week follow-up.",
+      },
+      {
+        imageSrc: "/images/clavicle/metal.jpg",
+        caption: "New Hardware installed.",
+      },
+      {
+        imageSrc: "/images/clavicle/surgery.jpg",
+        caption: "Screws.",
+      },
+    ]}
+  >
+    <Timeline>
+      <TimelineItem
+        date="August 29"
+        datetime="2026-08-29"
+        title="Initial Fracture"
+        isFirst
+        iconHtml={hospitalIcon}
+      >
+        Over the bars (OTB) crash. Tried to avoid a trail obstacle by lifting my
+        rear wheel off the ground. Best guess is between the slope of the hill,
+        the small amount of brake I was grabbing, and probably too strong of a
+        hop, all of that contributed to just going past the balance point. Next
+        thing I knew I was so high in the air upside down. Then my bike came
+        crashing down on me exactly like a Friday Fail video.
+        <p>
+          <a
+            class="strava-link"
+            href="https://www.strava.com/activities/19953738369"
+            target="_blank"
+          >
+            <span class="strava-link-icon" set:html={stravaIcon} />
+            view ride
+          </a>
+        </p>
+      </TimelineItem>
+      <TimelineItem
+        date="September 14"
+        datetime="2026-09-14"
+        title="Follow-up X-ray"
+        side="end"
+        iconHtml={xrayIcon}
+      >
+        <p>
+          Checked healing progress. The gap had widened. Doc said it would
+          eventually heal without intervention, but it would take a minimum of 3
+          more months in a sling, and potentially weaker due to the angulation.
+        </p>
+        <p>
+          One thing I didn't realize on the process is that I wouldn't be able
+          to drive or help around the house. I am supposed to handle school drop
+          off and pick up. My neighbors have been pitching in to assist with a
+          lot of these tasks. My partner also had to use FMLA to assist with
+          pickup. All that to say, I really had no idea how much this was going
+          to set me back.
+        </p>
+      </TimelineItem>
+      <TimelineItem
+        date="September 15, 5:30am"
+        datetime="2026-09-15T05:30"
+        title="Surgery"
+        isLast
+        iconHtml={robotIcon}
+      >
+        Hardware added. One interesting thing is the bone didn't hurt whatsoever
+        after surgery. My shoulder however, felt like my muscle had been ripped
+        in half. Excruciating, radiant pain. It only stopped if I was completely
+        still and didn't move at all.
+      </TimelineItem>
+    </Timeline>
+  </ArticleGallery>
+</BaseLayout>

@@ -1,0 +1,29 @@
+---
+import GridLink from './GridLink.astro';
+import type { PostMetadata } from '../lib/posts';
+
+interface Props {
+  post: PostMetadata;
+  imageSrc?: string;
+  imageAlt?: string;
+  caption?: string;
+}
+
+const { post, imageSrc = post.cover, imageAlt = '', caption } = Astro.props;
+---
+
+<article class="article-page">
+  <div class="article-toolbar article-toolbar-end">
+    <GridLink />
+  </div>
+
+  <figure class="hero-figure">
+    <img src={imageSrc} alt={imageAlt} />
+    {caption && <figcaption set:html={caption} />}
+  </figure>
+
+  <section class="article-copy article-copy-below">
+    <h1>{post.title}</h1>
+    <slot />
+  </section>
+</article>

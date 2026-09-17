@@ -1,0 +1,34 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SingleArticle from "../components/SingleArticle.astro";
+import { formatPageTitle, getPostPage } from "../lib/posts";
+import type { PostMetadata } from "../lib/posts";
+
+export const metadata: PostMetadata = {
+  title: "Marji 2026",
+  date: "2026-09-17",
+  kind: "single",
+  cover: "/images/marji-2026-hero.png",
+  draft: true,
+}
+
+const { post, draftRedirect } = getPostPage(metadata, Astro.redirect);
+if (draftRedirect) {
+  return draftRedirect;
+}
+---
+
+<BaseLayout title={formatPageTitle(post)}>
+  <SingleArticle post={post}>
+    <p>The Marji has been on my radar for a few years now.</p>
+    <p>
+      I finally decided to give it a go for 2026. the adventure of bikereg boght
+      ticket on 10/17/25.
+    </p>
+    <p>
+      <a href="https://www.strava.com/activities/16593554884">crash</a>
+      didn't thin i'd be able to ride in 2026 at all. required 7 weeks of PT (01/26/2026
+      to 3/10/2026)
+    </p>
+  </SingleArticle>
+</BaseLayout>

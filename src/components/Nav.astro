@@ -1,0 +1,24 @@
+---
+import { getPostsByNewest } from "../data/posts";
+
+const currentPath = Astro.url.pathname;
+const postsByNewest = await getPostsByNewest();
+---
+
+<aside class="sidebar">
+  <nav class="side-nav" aria-label="Primary navigation">
+    <a class="side-nav-section" href="/">Posts</a>
+    {
+      postsByNewest.map((post) => (
+        <a
+          class="side-nav-item"
+          href={post.href}
+          aria-current={currentPath === post.href ? "page" : undefined}
+        >
+          {post.title}
+          {post.draft && <span class="draft-label">Draft</span>}
+        </a>
+      ))
+    }
+  </nav>
+</aside>

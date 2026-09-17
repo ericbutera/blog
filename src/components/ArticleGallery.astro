@@ -1,0 +1,105 @@
+---
+import GridLink from './GridLink.astro';
+import type { PostMetadata } from '../lib/posts';
+
+interface ImageSlide {
+  imageSrc: string;
+  imageAlt?: string;
+  caption?: string;
+}
+
+interface Props {
+  post: PostMetadata;
+  imageSlides: ImageSlide[];
+  contentFirst?: boolean;
+}
+
+const { post, imageSlides, contentFirst = false } = Astro.props;
+const total = imageSlides.length + 1;
+const contentSlide = contentFirst ? 1 : total;
+const imageSlideOffset = contentFirst ? 2 : 1;
+---
+
+<article class="article-page" data-gallery data-total={total}>
+  <div class="article-toolbar">
+    <div class="article-controls" aria-label="Article navigation">
+      <a href={`#${total}`} data-prev>Previous</a>
+      <span>/</span>
+      <a href="#2" data-next>Next</a>
+      <span class="count" data-count>(1 of {total})</span>
+    </div>
+    <GridLink />
+  </div>
+
+  {
+    contentFirst && (
+      <section class="gallery-slide article-copy is-active" id="1" data-slide="1">
+        <h1>{post.title}</h1>
+        <slot />
+      </section>
+    )
+  }
+
+  {
+    imageSlides.map((slide, index) => (
+      <section
+        class:list={['gallery-slide', !contentFirst && index === 0 && 'is-active']}
+        id={String(index + imageSlideOffset)}
+        data-slide={index + imageSlideOffset}
+      >
+        <figure class="hero-figure gallery-figure">
+          <img src={slide.imageSrc} alt={slide.imageAlt ?? ''} />
+          {slide.caption && <figcaption set:html={slide.caption} />}
+        </figure>
+      </section>
+    ))
+  }
+
+  {
+    !contentFirst && (
+      <section
+        class="gallery-slide article-copy"
+        id={String(contentSlide)}
+        data-slide={contentSlide}
+      >
+        <h1>{post.title}</h1>
+        <slot />
+      </section>
+    )
+  }
+</article>
+
+<script>
+  const getSlideFromHash = (total: number) => {
+    const raw = Number.parseInt(window.location.hash.replace('#', ''), 10);
+    return Number.isInteger(raw) && raw >= 1 && raw <= total ? raw : 1;
+  };
+
+  const showSlide = (gallery: HTMLElement, active: number) => {
+    const total = Number.parseInt(gallery.dataset.total ?? '1', 10);
+    const previous = active === 1 ? total : active - 1;
+    const next = active === total ? 1 : active + 1;
+
+    gallery.querySelectorAll<HTMLElement>('[data-slide]').forEach((slide) => {
+      slide.classList.toggle('is-active', slide.dataset.slide === String(active));
+    });
+
+    gallery.querySelector('[data-prev]')?.setAttribute('href', `#${previous}`);
+    gallery.querySelector('[data-next]')?.setAttribute('href', `#${next}`);
+
+    const count = gallery.querySelector('[data-count]');
+    if (count) {
+      count.textContent = `(${active} of ${total})`;
+    }
+  };
+
+  const updateGalleries = () => {
+    document.querySelectorAll<HTMLElement>('[data-gallery]').forEach((gallery) => {
+      const total = Number.parseInt(gallery.dataset.total ?? '1', 10);
+      showSlide(gallery, getSlideFromHash(total));
+    });
+  };
+
+  updateGalleries();
+  window.addEventListener('hashchange', updateGalleries);
+</script>

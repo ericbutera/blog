@@ -1,0 +1,16 @@
+---
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<ul
+  class:list={[
+    'timeline timeline-snap-icon max-md:timeline-compact timeline-vertical',
+    className,
+  ]}
+>
+  <slot />
+</ul>
