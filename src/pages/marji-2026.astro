@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import SingleArticle from "../components/SingleArticle.astro";
+import TrainingChart from "../components/TrainingChart.astro";
 import { formatPageTitle, getPostPage } from "../lib/posts";
 import type { PostMetadata } from "../lib/posts";
 
@@ -10,7 +11,7 @@ export const metadata: PostMetadata = {
   kind: "single",
   cover: "/images/marji-2026-hero.png",
   draft: true,
-}
+};
 
 const { post, draftRedirect } = getPostPage(metadata, Astro.redirect);
 if (draftRedirect) {
@@ -20,15 +21,126 @@ if (draftRedirect) {
 
 <BaseLayout title={formatPageTitle(post)}>
   <SingleArticle post={post}>
-    <p>The Marji has been on my radar for a few years now.</p>
     <p>
-      I finally decided to give it a go for 2026. the adventure of bikereg boght
-      ticket on 10/17/25.
+      I try to visit Marquette annually. It's my favorite place to ride in
+      Michigan. Over the years, I kept hearing about the Marji race. It's a
+      ridiculously hard, point-to-point race spanning three awesome trail
+      systems. But, I hadn't ever rode my mountain bike more than 70 miles on
+      mostly flat ground. And let's be real, 70 miles has to be an impossible
+      benchmark for most people. This race was laughably ridiculous to even
+      consider. Yet, I kept thinking about it.
     </p>
     <p>
-      <a href="https://www.strava.com/activities/16593554884">crash</a>
-      didn't thin i'd be able to ride in 2026 at all. required 7 weeks of PT (01/26/2026
-      to 3/10/2026)
+      After finding myself with some unexpected free time between 2024 and 2026,
+      I really upped my time on the bike. In 2024, my "long-rides" were about 30
+      to 40 miles. In 2025 I started with my regular 30 to 40 mile rides, but
+      around July, I increasted to about 50 to 70 miles. There really wasn't a
+      goal at the time.
     </p>
+    <TrainingChart />
+    <p>
+      After a visit to Marquette in September 2025, I finally decided to give it
+      a go for 2026.
+    </p>
+    <p>
+      The first hurdle is registering for the event. If you've never tried, it's
+      a foundational piece of the experience. There is a lot of teasing about
+      when registration will open. A lot of this is misinformation designed for
+      maximum torture. Their registration service, BikeReg, doesn't handle
+      concurrency very well, causing angst and strife. The event sells out
+      within minutes of opening. As I went thru the registration process, there
+      were a lot of popups and messages along the way. I knew I was fighting the
+      clock, so I YOLO'd some of the answers thinking it'd be easier to fix
+      things after if I had to.
+    </p>
+    <p>
+      I was feeling pretty good about getting into the race. I had also been
+      working really hard at trying to improve my downhill skills for the year.
+      Silly me ended up having a
+      <a href="https://www.strava.com/activities/16593554884">crash</a> on November
+      28, 2025. There had been a snow the day before and I misjudged where the berm
+      was supposed to be causing me to smash my shoulder into the top going 18+ mph.
+      This was the first proper crash I'd had where I couldn't brush myself off and
+      get home OK. There wasn't a way to put weight on my right arm the whole way
+      home. What is interesting about this crash is that I was able to continue riding
+      after a few days. It was confusing though because some arm positions were incredibly
+      weak. After a few weeks of thinking I was healing and getting progressivly worse,
+      I admitted defeat and got checked by my doctor. The good news: nothing was broken.
+      The bad news: it can take longer to heal fleshy bits than bone in cases like
+      this. This was not good. Marji was at risk. I had a spring trip to Brevard,
+      NC planned. Basically, all was ruined.
+    </p>
+    <p>
+      In January, I started Physical Therapy (PT) and was told my rotator cuff
+      was pretty bad. By that time I couldn't lift my arm over my head anymore.
+      I had to start with the little pink 2 lbs weight for some of the
+      exercises. If you've never experienced PT before, I highly recommend.
+      There are a couple of touchpoint visits per week along with homework. I
+      took the home training quite seriously doing all of them above and beyond,
+      and it really paid off. After 7 weeks of PT things were getting better!
+    </p>
+    <p>
+      My previous "training" was basically do a couple of short rides during the
+      week and one hero effort on the weekend. For me, hero was defined as 4+
+      hours at max effort. It just wasn't working. I kept hitting a wall and
+      would quickly lose steam. It's also clear from my heart rate and hourly
+      average speed things fell apart after 4 hours. I needed more information.
+    </p>
+    <p>
+      In March 2026, I started researching endurance bike training plans. I read
+      a lot about other people's experiences and found that for beginners,
+      consistency was the best plan. If we are specifically training endurance,
+      becoming more efficient in Zone 2 is key. This is a massive
+      oversimplification, but it's a framework that I could iterate and review
+      progress. This is also counter to the approach I'd been using over the
+      last few years where I put everything I had into a weekend rip. At this
+      point I became really excited to see if I could push past my limits.
+    </p>
+    <p>
+      Ok, so now my training plan was to just ride my bike a lot. Easy. Try not
+      to take multiple days off, check. I knew the course is about 110 miles
+      with 13,000 feet of elevation, usually technical, punchy stuff. That was a
+      problem for later.
+    </p>
+    <p>
+      It was hard to get into a consistent training rhythm. It wasn't that I
+      didn't want to ride, but rather, the unmarked singletrack felt boring
+      after being in Brevard, NC this past spring. Nasty technical trails are my
+      favorite. Give me rocks, roots, and drops. I'm not interested in climbing
+      unless it's technical (aka <a
+        href="https://www.trailforks.com/trails/zone-4/">zone 4</a
+      >) or there's a fun downhill on the other side. My training plans called
+      for a lot of zone 2 work, but I wanted to live the downhill life.
+    </p>
+    <p>
+      The <a
+        href="https://www.traversecitymi.gov/community/recreation-directory/grand-traverse-commons/grand-traverse-commons.html"
+        >Grand Traverse Commons Area</a
+      > has some sections like old orchard climb and root hill which fit tech climbs.
+      There are a few really fun flow trails as well. As an aside, I got back into
+      mountain biking too late to really progress to the level of downhill I want,
+      but I still give it my best.
+    </p>
+    <p>
+      By adjusting things like speed, cadence and route I was able to find ways
+      to make the commons work for most of my training needs. The only gap was
+      distance. I had been riding out to the unmarked Vasa trails to work on
+      that part. However the city started a large infrastructure project that
+      made it annoying to get across town. I am always looking for reasons to
+      give up, so it was perfect.
+    </p>
+    <p>
+      Luckily there was still ways to get some distance in town by linking
+      together different trail systems.
+    </p>
+    <p>
+      Fast-forward to August 2026 and I was feeling really good about my
+      progress. I finished the Lumberjack 100 with a sub-10 hour from last
+      place. I also was starting to make Strava Top 10 trophies on some of the
+      segments I loved. That was the most shocking part- I never thought it'd be
+      possible.
+    </p>
+    <p>chickenleg time pretty good</p>
+    <p>crash - out for season</p>
   </SingleArticle>
 </BaseLayout>

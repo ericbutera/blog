@@ -5,6 +5,26 @@ const currentPath = Astro.url.pathname;
 const postsByNewest = await getPostsByNewest();
 ---
 
+<div class="mobile-nav dropdown">
+  <button tabindex="0" class="btn btn-sm btn-outline">Posts</button>
+  <ul
+    tabindex="0"
+    class="menu dropdown-content bg-base-100 rounded-box z-10 mt-2 w-72 p-2 shadow"
+  >
+    <li><a href="/">All posts</a></li>
+    {
+      postsByNewest.map((post) => (
+        <li>
+          <a href={post.href} class:list={{ active: currentPath === post.href }}>
+            {post.title}
+            {post.draft && <span class="draft-label">Draft</span>}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
 <aside class="sidebar">
   <nav class="side-nav" aria-label="Primary navigation">
     <a class="side-nav-section" href="/">Posts</a>

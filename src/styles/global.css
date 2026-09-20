@@ -51,6 +51,10 @@ body {
   min-height: calc(100vh - 120px);
 }
 
+.mobile-nav {
+  display: none;
+}
+
 .side-nav {
   display: flex;
   flex-direction: column;
@@ -328,28 +332,26 @@ p {
   }
 
   .sidebar {
-    position: static;
-    min-height: 0;
-    margin-bottom: 32px;
+    display: none;
   }
 
-  .side-nav {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 12px 20px;
+  .mobile-nav {
+    display: inline-block;
+    margin-bottom: 30px;
   }
 
-  .side-nav-section {
-    width: 100%;
+  .mobile-nav .dropdown-content {
+    max-width: calc(100vw - 44px);
   }
 
-  .side-nav-item {
-    padding-left: 0;
-    text-indent: 0;
+  .mobile-nav .menu a {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
 
-  .side-nav-item::before {
-    content: "";
+  .mobile-nav .draft-label {
+    flex: 0 0 auto;
   }
 
   .sidebar-footer {

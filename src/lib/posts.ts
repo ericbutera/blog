@@ -14,8 +14,11 @@ export interface PostSummary extends PostMetadata {
 }
 
 export const siteTitle = "Eric Butera Blog";
+const draftMode =
+  import.meta.env.PUBLIC_DRAFT_MODE ?? import.meta.env.DRAFT_MODE;
+
 export const isDraftMode =
-  import.meta.env.DRAFT_MODE === "1" || import.meta.env.DRAFT_MODE === "true";
+  draftMode === "1" || draftMode === "true";
 
 export const withPostPath = (
   slug: string,
