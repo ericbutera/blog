@@ -1,0 +1,268 @@
+---
+import bodyBatteryRaw from "../data/2026-09-14 body battery.json?raw";
+
+interface BodyBatteryRecord {
+  calendarDate: string;
+  values: {
+    lowBodyBattery: number;
+    highBodyBattery: number;
+  };
+}
+
+const monthNames = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+function formatDateLabel(calendarDate: string): string {
+  const [, month = "", day = ""] = calendarDate.split("-");
+
+  return `${monthNames[Number(month) - 1]} ${Number(day)}`;
+}
+
+const records = (JSON.parse(bodyBatteryRaw) as BodyBatteryRecord[])
+  .filter(
+    (record) =>
+      /^\d{4}-\d{2}-\d{2}$/.test(record.calendarDate) &&
+      Number.isFinite(record.values.lowBodyBattery) &&
+      Number.isFinite(record.values.highBodyBattery),
+  )
+  .sort(
+    (left, right) =>
+      Date.parse(`${left.calendarDate}T00:00:00`) -
+      Date.parse(`${right.calendarDate}T00:00:00`),
+  );
+
+const chartData = {
+  labels: records.map((record) => formatDateLabel(record.calendarDate)),
+  lows: records.map((record) => record.values.lowBodyBattery),
+  highs: records.map((record) => record.values.highBodyBattery),
+};
+---
+
+<figure
+  class="body-battery-chart"
+  data-body-battery-chart
+  data-chart-data={JSON.stringify(chartData)}
+>
+  <h2 class="body-battery-chart-title">Body Battery Daily High/Low</h2>
+
+  <div class="body-battery-chart-viewport">
+    <canvas aria-label="Daily body battery high and low" role="img"></canvas>
+  </div>
+</figure>
+
+<script>
+  import {
+    BarController,
+    BarElement,
+    CategoryScale,
+    Chart,
+    LinearScale,
+    LineController,
+    PointElement,
+    Tooltip,
+  } from "chart.js";
+  import type { ChartConfigurationCustomTypesPerDataset } from "chart.js";
+
+  Chart.register(
+    BarController,
+    BarElement,
+    CategoryScale,
+    LinearScale,
+    LineController,
+    PointElement,
+    Tooltip,
+  );
+
+  interface BodyBatteryChartData {
+    labels: string[];
+    lows: number[];
+    highs: number[];
+  }
+
+  const charts = new WeakMap<Element, Chart>();
+
+  function initBodyBatteryChart(container: HTMLElement): void {
+    const canvas = container.querySelector("canvas");
+    const rawChartData = container.dataset.chartData;
+
+    if (!canvas || !rawChartData) {
+      return;
+    }
+
+    const chartData = JSON.parse(rawChartData) as BodyBatteryChartData;
+    const config: ChartConfigurationCustomTypesPerDataset<
+      "bar" | "line",
+      (number | [number, number])[],
+      string
+    > = {
+      data: {
+        labels: chartData.labels,
+        datasets: [
+          {
+            type: "bar",
+            label: "Daily Range",
+            data: chartData.lows.map((low, index) => [low, chartData.highs[index]]),
+            backgroundColor: "#e4e4e4",
+            borderColor: "#e4e4e4",
+            borderSkipped: false,
+            barThickness: 12,
+            borderWidth: 0,
+            order: 3,
+          },
+          {
+            type: "line",
+            label: "Daily High",
+            data: chartData.highs,
+            showLine: false,
+            borderColor: "#3393ee",
+            backgroundColor: "#3393ee",
+            pointBackgroundColor: "#3393ee",
+            pointBorderColor: "#3393ee",
+            pointHoverRadius: 7,
+            pointRadius: 6,
+            pointStyle: "circle",
+            order: 1,
+          },
+          {
+            type: "line",
+            label: "Daily Low",
+            data: chartData.lows,
+            showLine: false,
+            borderColor: "#000000",
+            backgroundColor: "#000000",
+            pointBackgroundColor: "#000000",
+            pointBorderColor: "#000000",
+            pointHoverRadius: 7,
+            pointRadius: 6,
+            pointStyle: "circle",
+            order: 0,
+          },
+        ],
+      },
+      options: {
+        maintainAspectRatio: false,
+        responsive: true,
+        layout: {
+          padding: {
+            top: 8,
+          },
+        },
+        plugins: {
+          legend: {
+            display: true,
+            labels: {
+              boxHeight: 10,
+              boxWidth: 10,
+              color: "#202020",
+              filter(item) {
+                return item.text !== "Daily Range";
+              },
+              padding: 22,
+              usePointStyle: true,
+            },
+            position: "bottom",
+          },
+          tooltip: {
+            callbacks: {
+              label(context) {
+                const label = context.dataset.label ?? "";
+
+                if (label === "Daily Range") {
+                  const [low, high] = context.raw as [number, number];
+
+                  return `Daily Range: ${low}-${high}`;
+                }
+
+                return `${label}: ${context.parsed.y}`;
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: {
+              display: false,
+            },
+            ticks: {
+              color: "#202020",
+              maxRotation: 60,
+              minRotation: 60,
+            },
+          },
+          y: {
+            beginAtZero: true,
+            max: 100,
+            ticks: {
+              color: "#202020",
+              stepSize: 25,
+            },
+            grid: {
+              color: "#c9c9c9",
+              lineWidth: 1,
+            },
+            border: {
+              display: false,
+            },
+          },
+        },
+      },
+    };
+
+    const chart = new Chart(canvas, config);
+
+    charts.set(container, chart);
+  }
+
+  document
+    .querySelectorAll<HTMLElement>("[data-body-battery-chart]")
+    .forEach((container) => {
+      if (!charts.has(container)) {
+        initBodyBatteryChart(container);
+      }
+    });
+</script>
+
+<style>
+  .body-battery-chart {
+    display: grid;
+    gap: 18px;
+    margin: 30px 0 34px;
+  }
+
+  .body-battery-chart-title {
+    margin: 0;
+    color: #303030;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.25;
+    text-align: center;
+  }
+
+  .body-battery-chart-viewport {
+    width: 100%;
+    height: 330px;
+    min-height: 300px;
+  }
+
+  @media (max-width: 560px) {
+    .body-battery-chart {
+      margin: 26px 0 30px;
+    }
+
+    .body-battery-chart-viewport {
+      height: 300px;
+    }
+  }
+</style>

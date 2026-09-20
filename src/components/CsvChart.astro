@@ -1,0 +1,357 @@
+---
+import type { CsvChartData } from "../lib/chart-data";
+
+interface ChartControl {
+  key: string;
+  label: string;
+}
+
+interface Props {
+  data: CsvChartData;
+  ariaLabel: string;
+  title?: string;
+  className?: string;
+  controls?: ChartControl[];
+  defaultSeriesKey?: string;
+  legend?: string;
+  type?: "bar" | "line";
+  xAxisTitle?: string;
+  yAxisTitle?: string;
+  yMin?: number;
+  yMax?: number;
+}
+
+const {
+  data,
+  ariaLabel,
+  title,
+  className,
+  controls,
+  defaultSeriesKey,
+  legend,
+  type = "bar",
+  xAxisTitle,
+  yAxisTitle,
+  yMin,
+  yMax,
+} = Astro.props;
+
+const controlItems =
+  controls ??
+  Object.entries(data.series).map(([key, series]) => ({
+    key,
+    label: series.label,
+  }));
+const resolvedDefaultSeriesKey =
+  defaultSeriesKey ?? controlItems[0]?.key ?? Object.keys(data.series)[0] ?? "";
+const hasControls = controlItems.length > 1;
+---
+
+<figure
+  class:list={["csv-chart", className]}
+  data-csv-chart
+  data-chart-data={JSON.stringify(data)}
+  data-chart-type={type}
+  data-default-series={resolvedDefaultSeriesKey}
+  data-x-axis-title={xAxisTitle}
+  data-y-axis-title={yAxisTitle}
+  data-y-min={yMin}
+  data-y-max={yMax}
+>
+  {title && <h2 class="csv-chart-title">{title}</h2>}
+
+  {
+    hasControls && (
+      <div class="tabs tabs-box csv-chart-tabs" role="tablist">
+        {controlItems.map((control, index) => (
+          <button
+            aria-selected={index === 0 ? "true" : "false"}
+            class:list={["tab", index === 0 && "tab-active"]}
+            data-series-key={control.key}
+            role="tab"
+            type="button"
+          >
+            {control.label}
+          </button>
+        ))}
+      </div>
+    )
+  }
+
+  <div class="csv-chart-viewport">
+    <canvas aria-label={ariaLabel} role="img"></canvas>
+  </div>
+
+  {legend && <figcaption class="csv-chart-legend">{legend}</figcaption>}
+</figure>
+
+<script>
+  import {
+    BarController,
+    BarElement,
+    CategoryScale,
+    Chart,
+    LinearScale,
+    LineController,
+    LineElement,
+    PointElement,
+    Tooltip,
+  } from "chart.js";
+  import type { ChartDataset, ChartType } from "chart.js";
+  import type { ChartSeries, CsvChartData } from "../lib/chart-data";
+
+  Chart.register(
+    BarController,
+    BarElement,
+    CategoryScale,
+    LinearScale,
+    LineController,
+    LineElement,
+    PointElement,
+    Tooltip,
+  );
+
+  type CsvChartType = Extract<ChartType, "bar" | "line">;
+
+  const charts = new WeakMap<Element, Chart>();
+
+  function formatValue(value: number, series: ChartSeries): string {
+    const formattedValue = new Intl.NumberFormat("en-US", {
+      maximumFractionDigits: series.maximumFractionDigits ?? 0,
+    }).format(value);
+
+    return series.unit ? `${formattedValue} ${series.unit}` : formattedValue;
+  }
+
+  function getSeriesData(
+    chartData: CsvChartData,
+    key: string,
+  ): ChartSeries {
+    return chartData.series[key] ?? Object.values(chartData.series)[0];
+  }
+
+  function getYAxisTitle(series: ChartSeries, explicitTitle?: string): string {
+    if (explicitTitle) {
+      return explicitTitle;
+    }
+
+    return series.unit ? `${series.label} (${series.unit})` : series.label;
+  }
+
+  function getDataset(
+    chartType: CsvChartType,
+    series: ChartSeries,
+  ): ChartDataset<CsvChartType, number[]> {
+    if (chartType === "line") {
+      return {
+        label: series.label,
+        data: series.values,
+        backgroundColor: "rgba(47, 127, 116, 0.14)",
+        borderColor: "#2f7f74",
+        borderWidth: 2,
+        fill: true,
+        pointBackgroundColor: "#ffffff",
+        pointBorderColor: "#2f7f74",
+        pointBorderWidth: 2,
+        pointHoverRadius: 5,
+        pointRadius: 4,
+        tension: 0.32,
+      };
+    }
+
+    return {
+      label: series.label,
+      data: series.values,
+      backgroundColor: "#5d86bd",
+      borderColor: "#406895",
+      borderRadius: 3,
+      borderWidth: 1,
+    };
+  }
+
+  function parseOptionalNumber(rawValue: string | undefined): number | undefined {
+    if (rawValue === undefined || rawValue === "") {
+      return undefined;
+    }
+
+    const value = Number(rawValue);
+
+    return Number.isFinite(value) ? value : undefined;
+  }
+
+  function updateYAxisTitle(chart: Chart, title: string): void {
+    const yScale = chart.options.scales?.y as
+      | { title?: { text?: string | string[] } }
+      | undefined;
+
+    if (yScale?.title) {
+      yScale.title.text = title;
+    }
+  }
+
+  function initCsvChart(container: HTMLElement): void {
+    const canvas = container.querySelector("canvas");
+    const tabs = Array.from(
+      container.querySelectorAll<HTMLButtonElement>("[data-series-key]"),
+    );
+    const rawChartData = container.dataset.chartData;
+    const defaultSeries =
+      container.dataset.defaultSeries ?? tabs[0]?.dataset.seriesKey;
+
+    if (!canvas || !rawChartData || !defaultSeries) {
+      return;
+    }
+
+    const chartType: CsvChartType =
+      container.dataset.chartType === "line" ? "line" : "bar";
+    const chartData = JSON.parse(rawChartData) as CsvChartData;
+    const initialSeries = getSeriesData(chartData, defaultSeries);
+    const explicitYAxisTitle = container.dataset.yAxisTitle;
+    const chart = new Chart(canvas, {
+      type: chartType,
+      data: {
+        labels: chartData.labels,
+        datasets: [getDataset(chartType, initialSeries)],
+      },
+      options: {
+        maintainAspectRatio: false,
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            callbacks: {
+              label(context) {
+                const series = getSeriesData(
+                  chartData,
+                  container.dataset.activeSeries ?? defaultSeries,
+                );
+                return `${series.label}: ${formatValue(Number(context.raw), series)}`;
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: {
+              display: false,
+            },
+            title: {
+              display: Boolean(container.dataset.xAxisTitle),
+              text: container.dataset.xAxisTitle,
+            },
+          },
+          y: {
+            beginAtZero: chartType === "bar",
+            grid: {
+              color: "#eeeeee",
+            },
+            max: parseOptionalNumber(container.dataset.yMax),
+            min: parseOptionalNumber(container.dataset.yMin),
+            ticks: {
+              callback(value) {
+                const series = getSeriesData(
+                  chartData,
+                  container.dataset.activeSeries ?? defaultSeries,
+                );
+                return formatValue(Number(value), series);
+              },
+            },
+            title: {
+              display: true,
+              text: getYAxisTitle(initialSeries, explicitYAxisTitle),
+            },
+          },
+        },
+      },
+    });
+
+    charts.set(container, chart);
+    container.dataset.activeSeries = defaultSeries;
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const seriesKey = tab.dataset.seriesKey;
+
+        if (!seriesKey) {
+          return;
+        }
+
+        const series = getSeriesData(chartData, seriesKey);
+        container.dataset.activeSeries = seriesKey;
+        chart.data.datasets[0] = getDataset(chartType, series);
+        updateYAxisTitle(chart, getYAxisTitle(series, explicitYAxisTitle));
+        chart.update();
+
+        tabs.forEach((item) => {
+          const isSelected = item === tab;
+          item.classList.toggle("tab-active", isSelected);
+          item.setAttribute("aria-selected", String(isSelected));
+        });
+      });
+    });
+  }
+
+  document
+    .querySelectorAll<HTMLElement>("[data-csv-chart]")
+    .forEach((container) => {
+      if (!charts.has(container)) {
+        initCsvChart(container);
+      }
+    });
+</script>
+
+<style>
+  .csv-chart {
+    display: grid;
+    gap: 18px;
+    margin: 30px 0 34px;
+  }
+
+  .csv-chart-title {
+    margin: 0;
+    color: #303030;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.25;
+    text-align: center;
+  }
+
+  .csv-chart-tabs {
+    width: fit-content;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .csv-chart-tabs .tab {
+    white-space: nowrap;
+  }
+
+  .csv-chart-viewport {
+    width: 100%;
+    height: 340px;
+    min-height: 300px;
+  }
+
+  .csv-chart-legend {
+    color: #686868;
+    font-size: 0.85rem;
+    line-height: 1.35;
+  }
+
+  @media (max-width: 560px) {
+    .csv-chart {
+      gap: 14px;
+      margin: 26px 0 30px;
+    }
+
+    .csv-chart-tabs {
+      width: 100%;
+    }
+
+    .csv-chart-viewport {
+      height: 300px;
+    }
+  }
+</style>

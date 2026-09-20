@@ -1,7 +1,10 @@
 ---
+import CsvChart from "./CsvChart.astro";
 import trainingCsv from "../data/training.csv?raw";
+import { createChartData } from "../lib/chart-data";
+import { parseCsv, parseDurationHours, parseNumber } from "../lib/csv";
+import type { CsvRow } from "../lib/csv";
 
-type CsvRow = Record<string, string>;
 type ReportValue = "number" | "durationHours";
 
 interface Report {
@@ -10,6 +13,7 @@ interface Report {
   source: string;
   unit: string;
   value: ReportValue;
+  maximumFractionDigits?: number;
 }
 
 const reports: Report[] = [
@@ -26,6 +30,7 @@ const reports: Report[] = [
     source: "Total Activity Time",
     unit: "hours",
     value: "durationHours",
+    maximumFractionDigits: 1,
   },
   {
     key: "ascent",
@@ -47,69 +52,9 @@ const reports: Report[] = [
     source: "Average Speed",
     unit: "mph",
     value: "number",
+    maximumFractionDigits: 1,
   },
 ];
-
-function parseCsv(raw: string): CsvRow[] {
-  const rows: string[][] = [];
-  let row: string[] = [];
-  let field = "";
-  let inQuotes = false;
-
-  for (let index = 0; index < raw.length; index += 1) {
-    const char = raw[index];
-    const next = raw[index + 1];
-
-    if (char === '"' && inQuotes && next === '"') {
-      field += '"';
-      index += 1;
-    } else if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === "," && !inQuotes) {
-      row.push(field);
-      field = "";
-    } else if ((char === "\n" || char === "\r") && !inQuotes) {
-      if (char === "\r" && next === "\n") {
-        index += 1;
-      }
-      row.push(field);
-      rows.push(row);
-      row = [];
-      field = "";
-    } else {
-      field += char;
-    }
-  }
-
-  if (field.length > 0 || row.length > 0) {
-    row.push(field);
-    rows.push(row);
-  }
-
-  const [headers = [], ...records] = rows.filter((record) =>
-    record.some((value) => value.trim().length > 0),
-  );
-
-  return records.map((record) =>
-    Object.fromEntries(
-      headers.map((header, index) => [header, record[index] ?? ""]),
-    ),
-  );
-}
-
-function parseNumber(rawValue: string): number {
-  return Number(rawValue.replace(/[^0-9.-]/g, ""));
-}
-
-function parseDurationHours(rawValue: string): number {
-  const [hours = "0", minutes = "0", seconds = "0"] = rawValue
-    .split(" ")[0]
-    .split(":");
-  const totalHours =
-    Number(hours) + Number(minutes) / 60 + Number(seconds) / 3600;
-
-  return Number(totalHours.toFixed(1));
-}
 
 function parseReportValue(row: CsvRow, report: Report): number {
   const rawValue = row[report.source] ?? "0";
@@ -123,246 +68,31 @@ function parseReportValue(row: CsvRow, report: Report): number {
 
 const rows = parseCsv(trainingCsv)
   .filter((row) => /^\d{4}$/.test(row["Time Period"] ?? ""))
-  .sort((left, right) => Number(left["Time Period"]) - Number(right["Time Period"]));
-
-const chartData = {
-  labels: rows.map((row) => row["Time Period"]),
-  reports: Object.fromEntries(
-    reports.map((report) => [
-      report.key,
-      {
-        label: report.label,
-        unit: report.unit,
-        values: rows.map((row) => parseReportValue(row, report)),
-      },
-    ]),
-  ),
-};
----
-
-<figure
-  class="training-chart"
-  data-training-chart
-  data-chart-data={JSON.stringify(chartData)}
-  data-default-report={reports[0].key}
->
-  <div class="tabs tabs-box training-chart-tabs" role="tablist">
-    {
-      reports.map((report, index) => (
-        <button
-          aria-selected={index === 0 ? "true" : "false"}
-          class:list={["tab", index === 0 && "tab-active"]}
-          data-report-key={report.key}
-          role="tab"
-          type="button"
-        >
-          {report.label}
-        </button>
-      ))
-    }
-  </div>
-
-  <div class="training-chart-viewport">
-    <canvas aria-label="Yearly training totals" role="img"></canvas>
-  </div>
-</figure>
-
-<script>
-  import {
-    BarController,
-    BarElement,
-    CategoryScale,
-    Chart,
-    LinearScale,
-    Tooltip,
-  } from "chart.js";
-
-  Chart.register(
-    BarController,
-    BarElement,
-    CategoryScale,
-    LinearScale,
-    Tooltip,
+  .sort(
+    (left, right) =>
+      Number(left["Time Period"]) - Number(right["Time Period"]),
   );
 
-  interface ReportData {
-    label: string;
-    unit: string;
-    values: number[];
-  }
+const chartData = createChartData(
+  rows,
+  (row) => row["Time Period"],
+  reports.map((report) => ({
+    key: report.key,
+    label: report.label,
+    unit: report.unit,
+    maximumFractionDigits: report.maximumFractionDigits,
+    value: (row) => parseReportValue(row, report),
+  })),
+);
+---
 
-  interface TrainingChartData {
-    labels: string[];
-    reports: Record<string, ReportData>;
-  }
-
-  const charts = new WeakMap<Element, Chart>();
-
-  function formatValue(value: number, unit: string): string {
-    return new Intl.NumberFormat("en-US", {
-      maximumFractionDigits: unit === "hours" || unit === "mph" ? 1 : 0,
-    }).format(value);
-  }
-
-  function getReportData(
-    chartData: TrainingChartData,
-    key: string,
-  ): ReportData {
-    return chartData.reports[key] ?? Object.values(chartData.reports)[0];
-  }
-
-  function initTrainingChart(container: HTMLElement): void {
-    const canvas = container.querySelector("canvas");
-    const tabs = Array.from(
-      container.querySelectorAll<HTMLButtonElement>("[data-report-key]"),
-    );
-    const rawChartData = container.dataset.chartData;
-    const defaultReport = container.dataset.defaultReport ?? tabs[0]?.dataset.reportKey;
-
-    if (!canvas || !rawChartData || !defaultReport) {
-      return;
-    }
-
-    const chartData = JSON.parse(rawChartData) as TrainingChartData;
-    const initialReport = getReportData(chartData, defaultReport);
-    const chart = new Chart(canvas, {
-      type: "bar",
-      data: {
-        labels: chartData.labels,
-        datasets: [
-          {
-            label: initialReport.label,
-            data: initialReport.values,
-            backgroundColor: "#5d86bd",
-            borderColor: "#406895",
-            borderRadius: 3,
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        maintainAspectRatio: false,
-        responsive: true,
-        plugins: {
-          legend: {
-            display: false,
-          },
-          tooltip: {
-            callbacks: {
-              label(context) {
-                const report = getReportData(
-                  chartData,
-                  container.dataset.activeReport ?? defaultReport,
-                );
-                return `${report.label}: ${formatValue(Number(context.raw), report.unit)} ${report.unit}`;
-              },
-            },
-          },
-        },
-        scales: {
-          x: {
-            grid: {
-              display: false,
-            },
-            title: {
-              display: true,
-              text: "Year",
-            },
-          },
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: "#eeeeee",
-            },
-            ticks: {
-              callback(value) {
-                const report = getReportData(
-                  chartData,
-                  container.dataset.activeReport ?? defaultReport,
-                );
-                return formatValue(Number(value), report.unit);
-              },
-            },
-            title: {
-              display: true,
-              text: `${initialReport.label} (${initialReport.unit})`,
-            },
-          },
-        },
-      },
-    });
-
-    charts.set(container, chart);
-    container.dataset.activeReport = defaultReport;
-
-    tabs.forEach((tab) => {
-      tab.addEventListener("click", () => {
-        const reportKey = tab.dataset.reportKey;
-
-        if (!reportKey) {
-          return;
-        }
-
-        const report = getReportData(chartData, reportKey);
-        container.dataset.activeReport = reportKey;
-        chart.data.datasets[0].label = report.label;
-        chart.data.datasets[0].data = report.values;
-        chart.options.scales!.y!.title!.text = `${report.label} (${report.unit})`;
-        chart.update();
-
-        tabs.forEach((item) => {
-          const isSelected = item === tab;
-          item.classList.toggle("tab-active", isSelected);
-          item.setAttribute("aria-selected", String(isSelected));
-        });
-      });
-    });
-  }
-
-  document
-    .querySelectorAll<HTMLElement>("[data-training-chart]")
-    .forEach((container) => {
-      if (!charts.has(container)) {
-        initTrainingChart(container);
-      }
-    });
-</script>
-
-<style>
-  .training-chart {
-    display: grid;
-    gap: 18px;
-    margin: 30px 0 34px;
-  }
-
-  .training-chart-tabs {
-    width: fit-content;
-    max-width: 100%;
-    overflow-x: auto;
-  }
-
-  .training-chart-tabs .tab {
-    white-space: nowrap;
-  }
-
-  .training-chart-viewport {
-    width: 100%;
-    height: 340px;
-    min-height: 300px;
-  }
-
-  @media (max-width: 560px) {
-    .training-chart {
-      gap: 14px;
-      margin: 26px 0 30px;
-    }
-
-    .training-chart-tabs {
-      width: 100%;
-    }
-
-    .training-chart-viewport {
-      height: 300px;
-    }
-  }
-</style>
+<CsvChart
+  ariaLabel="Yearly training totals"
+  className="training-chart"
+  controls={reports.map(({ key, label }) => ({ key, label }))}
+  data={chartData}
+  defaultSeriesKey={reports[0].key}
+  title="Yearly Training Totals"
+  type="bar"
+  xAxisTitle="Year"
+/>

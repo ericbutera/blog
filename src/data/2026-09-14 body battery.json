@@ -1,0 +1,58 @@
+[
+    {
+        "calendarDate": "2026-09-13",
+        "values": {
+            "lowBodyBattery": 17,
+            "highBodyBattery": 72
+        }
+    },
+    {
+        "calendarDate": "2026-09-14",
+        "values": {
+            "lowBodyBattery": 5,
+            "highBodyBattery": 64
+        }
+    },
+    {
+        "calendarDate": "2026-09-15",
+        "values": {
+            "lowBodyBattery": 6,
+            "highBodyBattery": 38
+        }
+    },
+    {
+        "calendarDate": "2026-09-16",
+        "values": {
+            "lowBodyBattery": 10,
+            "highBodyBattery": 26
+        }
+    },
+    {
+        "calendarDate": "2026-09-17",
+        "values": {
+            "lowBodyBattery": 16,
+            "highBodyBattery": 74
+        }
+    },
+    {
+        "calendarDate": "2026-09-18",
+        "values": {
+            "lowBodyBattery": 19,
+            "highBodyBattery": 78
+        }
+    },
+    {
+        "calendarDate": "2026-09-19",
+        "values": {
+            "lowBodyBattery": 15,
+            "highBodyBattery": 65
+        }
+    },
+    {
+        "calendarDate": "2026-09-20",
+        "values": {
+            "lowBodyBattery": 14,
+            "highBodyBattery": 54
+        }
+    }
+]

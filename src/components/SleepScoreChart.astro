@@ -1,0 +1,53 @@
+---
+import CsvChart from "./CsvChart.astro";
+import sleepCsv from "../data/2026-09-14 sleep.csv?raw";
+import { createChartData } from "../lib/chart-data";
+import { parseCsv } from "../lib/csv";
+
+const dateColumn = "Sleep Score";
+
+const rows = parseCsv(sleepCsv)
+  .filter((row) => {
+    const score = Number(row.Score);
+
+    return (
+      /^\d{4}-\d{2}-\d{2}$/.test(row[dateColumn] ?? "") &&
+      Number.isFinite(score)
+    );
+  })
+  .sort(
+    (left, right) =>
+      Date.parse(`${left[dateColumn]}T00:00:00`) -
+      Date.parse(`${right[dateColumn]}T00:00:00`),
+  )
+  .slice(-8);
+
+const chartData = createChartData(
+  rows,
+  (row) => {
+    const [, month = "", day = ""] = row[dateColumn].split("-");
+
+    return `${Number(month)}/${Number(day)}`;
+  },
+  [
+    {
+      key: "sleepScore",
+      label: "Sleep Score",
+      value: (row) => Number(row.Score),
+    },
+  ],
+);
+---
+
+<CsvChart
+  ariaLabel="Sleep score over the last 7 days"
+  className="sleep-score-chart"
+  data={chartData}
+  defaultSeriesKey="sleepScore"
+  title="Sleep Score"
+  type="line"
+  xAxisTitle="Date (MM/DD)"
+  yAxisTitle="Sleep Score (0-100)"
+  yMin={30}
+  yMax={100}
+/>

@@ -1,16 +1,25 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ArticleGallery from "../components/ArticleGallery.astro";
+import BodyBatteryChart from "../components/BodyBatteryChart.astro";
+import SleepScoreChart from "../components/SleepScoreChart.astro";
 import Timeline from "../components/Timeline.astro";
 import TimelineItem from "../components/TimelineItem.astro";
 import { icon } from "@fortawesome/fontawesome-svg-core";
 import { faStrava } from "@fortawesome/free-brands-svg-icons";
-import { faHospital, faRobot, faXRay } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBed,
+  faBiking,
+  faClinicMedical,
+  faHospital,
+  faRobot,
+  faXRay,
+} from "@fortawesome/free-solid-svg-icons";
 import { formatPageTitle, getPostPage } from "../lib/posts";
 import type { PostMetadata } from "../lib/posts";
 
 export const metadata: PostMetadata = {
-  title: "Mildly Displaced Midclavicular Fractur",
+  title: "Mildly Displaced Midclavicular Fracture",
   date: "2026-09-14",
   kind: "gallery",
   cover: "/images/clavicle/initial.jpg",
@@ -26,6 +35,9 @@ const stravaIcon = icon(faStrava).html.join("");
 const hospitalIcon = icon(faHospital).html.join("");
 const xrayIcon = icon(faXRay).html.join("");
 const robotIcon = icon(faRobot).html.join("");
+const bedIcon = icon(faBed).html.join("");
+const officeIcon = icon(faClinicMedical).html.join("");
+const raceIcon = icon(faBiking).html.join("");
 ---
 
 <BaseLayout title={formatPageTitle(post)}>
@@ -71,7 +83,7 @@ const robotIcon = icon(faRobot).html.join("");
         crashing down on me exactly like a Friday Fail video.
         <p>
           <a
-            class="strava-link"
+            class="btn btn-outline btn-sm"
             href="https://www.strava.com/activities/19953738369"
             target="_blank"
           >
@@ -105,13 +117,56 @@ const robotIcon = icon(faRobot).html.join("");
         date="September 15, 5:30am"
         datetime="2026-09-15T05:30"
         title="Surgery"
-        isLast
         iconHtml={robotIcon}
       >
         Hardware added. One interesting thing is the bone didn't hurt whatsoever
         after surgery. My shoulder however, felt like my muscle had been ripped
         in half. Excruciating, radiant pain. It only stopped if I was completely
         still and didn't move at all.
+      </TimelineItem>
+      <TimelineItem
+        date="September 19, 7:30am"
+        datetime="2026-09-19T07:30"
+        title="Marji"
+        side="end"
+        iconHtml={raceIcon}
+      >
+        <p>
+          Marji race day! Wish I could have been there. Jorden Wakeley won on a
+          32" hardtail single-speed. I'm speechless.
+        </p>
+      </TimelineItem>
+      <TimelineItem
+        date="September 20, 5:30am"
+        datetime="2026-09-20T05:30"
+        title="Recovery"
+        iconHtml={bedIcon}
+      >
+        <p>
+          I am still waking up multiple times a night in pain. Yesterday was the
+          first time I've had energy to get up and move around since the
+          surgery. Definitely making progress!
+        </p>
+        <SleepScoreChart />
+        <BodyBatteryChart />
+      </TimelineItem>
+      <TimelineItem
+        date="September 29"
+        datetime="2026-09-29"
+        title="Surgery 2 week follow-up"
+        side="end"
+        iconHtml={officeIcon}
+      >
+        upcoming post-surgery 2 week follow up
+      </TimelineItem>
+      <TimelineItem
+        date="October 13"
+        datetime="2026-10-13"
+        title="Surgery 4 week follow-up"
+        isLast
+        iconHtml={officeIcon}
+      >
+        upcoming post-surgery 4 week follow up
       </TimelineItem>
     </Timeline>
   </ArticleGallery>
