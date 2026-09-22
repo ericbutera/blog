@@ -1,6 +1,7 @@
 ---
-import Nav from '../components/Nav.astro';
-import '../styles/global.css';
+import GoogleAnalytics from "../components/GoogleAnalytics.astro";
+import Nav from "../components/Nav.astro";
+import "../styles/global.css";
 
 interface Props {
   title: string;
@@ -23,6 +24,7 @@ const { title, description = "Eric Butera's blog" } = Astro.props;
       rel="stylesheet"
     />
     <title>{title}</title>
+    <GoogleAnalytics />
   </head>
   <body>
     <header class="masthead">

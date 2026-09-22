@@ -1,0 +1,28 @@
+---
+import {
+  googleAnalyticsId,
+  isGoogleAnalyticsEnabled,
+} from "../config/site";
+
+const gtagScriptUrl = googleAnalyticsId
+  ? `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(
+      googleAnalyticsId,
+    )}`
+  : undefined;
+---
+
+{
+  isGoogleAnalyticsEnabled && gtagScriptUrl && (
+    <>
+      <script async src={gtagScriptUrl} />
+      <script is:inline define:vars={{ googleAnalyticsId }}>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+          window.dataLayer.push(arguments);
+        }
+        gtag("js", new Date());
+        gtag("config", googleAnalyticsId);
+      </script>
+    </>
+  )
+}
