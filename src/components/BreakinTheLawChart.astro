@@ -1,0 +1,41 @@
+---
+import CsvChart from "./CsvChart.astro";
+import bestsJson from "../data/2018-2026 btl bests.json?raw";
+import { createChartData } from "../lib/chart-data";
+
+interface YearlyBest {
+  year: number;
+  duration_seconds: number;
+}
+
+interface SegmentBests {
+  segment_title: string;
+  years: YearlyBest[];
+}
+
+const bests = JSON.parse(bestsJson) as SegmentBests;
+const chartData = createChartData(
+  [...bests.years].sort((left, right) => left.year - right.year),
+  (best) => String(best.year),
+  [
+    {
+      key: "bestTime",
+      label: "Best time",
+      unit: "sec",
+      value: (best) => best.duration_seconds,
+    },
+  ],
+);
+---
+
+<CsvChart
+  ariaLabel={`Best time on ${bests.segment_title} by year, in seconds`}
+  data={chartData}
+  defaultSeriesKey="bestTime"
+  title={`${bests.segment_title}: Best Time by Year`}
+  type="line"
+  xAxisTitle="Year"
+  yAxisTitle="Time (seconds)"
+  yMin={60}
+  legend="Fastest effort each year. Lower times are faster."
+/>

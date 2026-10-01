@@ -1,0 +1,16 @@
+[tools]
+node = "25.2.1"
+
+[tasks.deps]
+description = "Install blog dependencies from the npm lockfile"
+run = "npm ci"
+
+[tasks.dev]
+description = "Start the blog development server"
+depends = ["deps"]
+run = "npm run dev"
+
+[tasks.build]
+description = "Check and build the blog"
+depends = ["deps"]
+run = "npm run build"

@@ -1,7 +1,10 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import BreakinTheLawChart from "../components/BreakinTheLawChart.astro";
+import FontAwesomeIcon from "../components/FontAwesomeIcon.astro";
 import SingleArticle from "../components/SingleArticle.astro";
 import TrainingChart from "../components/TrainingChart.astro";
+import { faStrava } from "@fortawesome/free-brands-svg-icons";
 import { formatPageTitle, getPostPage } from "../lib/posts";
 import type { PostMetadata } from "../lib/posts";
 
@@ -13,6 +16,8 @@ export const metadata: PostMetadata = {
   draft: true,
 };
 
+// todo: this doesn't make sense anymore
+// external fn to read `metadata`` above?
 const { post, draftRedirect } = getPostPage(metadata, Astro.redirect);
 if (draftRedirect) {
   return draftRedirect;
@@ -26,21 +31,36 @@ if (draftRedirect) {
       Michigan. Over the years, I kept hearing about the Marji race. It's a
       ridiculously hard, point-to-point race spanning three awesome trail
       systems. But, I hadn't ever rode my mountain bike more than 70 miles on
-      mostly flat ground. And let's be real, 70 miles has to be an impossible
-      benchmark for most people. This race was laughably ridiculous to even
-      consider. Yet, I kept thinking about it.
+      mostly flat ground. It seemed impossible, yet I kept thinking about it.
     </p>
     <p>
       After finding myself with some unexpected free time between 2024 and 2026,
       I really upped my time on the bike. In 2024, my "long-rides" were about 30
-      to 40 miles. In 2025 I started with my regular 30 to 40 mile rides, but
+      to 40 miles. In 2025, I started with my regular 30 to 40 mile rides, but
       around July, I increasted to about 50 to 70 miles. There really wasn't a
-      goal at the time.
+      goal at the time. I was more exploring what endurance rides were like.
     </p>
     <TrainingChart />
     <p>
-      After a visit to Marquette in September 2025, I finally decided to give it
-      a go for 2026.
+      todo: this is rough. work on timeline of getting serious about tech/pace.
+      then incorporate fear of rocks and rising to the occasion (top of the
+      world/no dab).
+    </p>
+    <p>
+      I've wanted to be competent at things like scary trail for years, but I
+      didn't really know how to safely progress my skills with the limited
+      terrain in Traverse City. I started watching the "How Not to Mountain
+      Bike" series by Ben Cathro. During each ride I was intentional to try
+      working on skills I saw in the videos. From 2023 to 2026 I was able to
+      move from the tp 50% to top 10 of all time on my local favorite segment
+      Breaking the Law. It's unreal.
+      <BreakinTheLawChart />
+    </p>
+    <p>
+      In September 2025 I visited Marquette and had an absolute blast. I focused
+      on a lot of the tech features I had always been afraid to ride.
+      <br />
+      look up segment progress from previous years (esp. doctors).
     </p>
     <p>
       The first hurdle is registering for the event. If you've never tried, it's
@@ -71,9 +91,9 @@ if (draftRedirect) {
       NC planned. Basically, all was ruined.
     </p>
     <p>
-      In January, I started Physical Therapy (PT) and was told my rotator cuff
-      was pretty bad. By that time I couldn't lift my arm over my head anymore.
-      I had to start with the little pink 2 lbs weight for some of the
+      In January 2026, I started Physical Therapy (PT) and was told my rotator
+      cuff was pretty bad. By that time I couldn't lift my arm over my head
+      anymore. I had to start with the little pink 2 lbs weight for some of the
       exercises. If you've never experienced PT before, I highly recommend.
       There are a couple of touchpoint visits per week along with homework. I
       took the home training quite seriously doing all of them above and beyond,
@@ -104,43 +124,56 @@ if (draftRedirect) {
     </p>
     <p>
       It was hard to get into a consistent training rhythm. It wasn't that I
-      didn't want to ride, but rather, the unmarked singletrack felt boring
-      after being in Brevard, NC this past spring. Nasty technical trails are my
-      favorite. Give me rocks, roots, and drops. I'm not interested in climbing
-      unless it's technical (aka <a
-        href="https://www.trailforks.com/trails/zone-4/">zone 4</a
+      didn't want to ride, but rather, the trails felt boring after a trip to
+      Brevard, NC in the spring. Nasty technical trails are my favorite. Give me
+      rocks, roots, and drops. I'm not interested in climbing unless it's
+      technical (aka <a href="https://www.trailforks.com/trails/zone-4/"
+        >zone 4</a
       >) or there's a fun downhill on the other side. My training plans called
-      for a lot of zone 2 work, but I wanted to live the downhill life.
+      for a lot of zone 2 work, but in my heart, I wanted to live the downhill
+      life. So how do I make this work?
     </p>
     <p>
       The <a
         href="https://www.traversecitymi.gov/community/recreation-directory/grand-traverse-commons/grand-traverse-commons.html"
         >Grand Traverse Commons Area</a
       > has some sections like old orchard climb and root hill which fit tech climbs.
-      There are a few really fun flow trails as well. As an aside, I got back into
-      mountain biking too late to really progress to the level of downhill I want,
-      but I still give it my best.
+      There are a few flow trails as well. As an aside, I got back into mountain biking
+      too late (2017) to really progress to the level of downhill I want, but I still
+      give it my best.
     </p>
     <p>
       By adjusting things like speed, cadence and route I was able to find ways
       to make the commons work for most of my training needs. The only gap was
-      distance. I had been riding out to the unmarked Vasa trails to work on
-      that part. However the city started a large infrastructure project that
-      made it annoying to get across town. I am always looking for reasons to
-      give up, so it was perfect.
+      distance. I had been riding out to the unmarked VASA trails to work on
+      that part. The city started a large infrastructure project that made it
+      annoying to get across town. I am always looking for reasons to give up,
+      so it was perfect.
     </p>
     <p>
-      Luckily there was still ways to get some distance in town by linking
-      together different trail systems.
+      Luckily, I was able to start stringing a few sections in town sections
+      together. This solved the distance issue and saved me from having to spend
+      an additional hour and a half riding to &amp; from the woods.
     </p>
     <p>
-      Fast-forward to August 2026 and I was feeling really good about my
-      progress. I finished the Lumberjack 100 with a sub-10 hour from last
-      place. I also was starting to make Strava Top 10 trophies on some of the
-      segments I loved. That was the most shocking part- I never thought it'd be
-      possible.
+      Fast-forward to August 2026. I was feeling really good about my progress.
+      According to strava I had climbed 60% more than the previous year. I had
+      40% more riding time and distance as well. I finished the Lumberjack 100
+      with a sub-10 hour from last place. I also was starting to make Strava Top
+      10 trophies on some of the segments I loved. That was the most shocking
+      part- I never thought it'd be possible.
     </p>
-    <p>chickenleg time pretty good</p>
-    <p>crash - out for season</p>
+    <p>
+      The conclusion of my 2026 season happened on <FontAwesomeIcon
+        icon={faStrava}
+        class="strava-link-icon"
+      /><a href="https://www.strava.com/activities/19953738369">August 29</a>. I
+      had been riding the chickenleg 100 course and misjudged an obstacle on
+      course. This wasn't an intentional feature, but rather a rock that had
+      rolled into the middle of the trail. I ended up going Over The Bars (OTB)
+      and landed on my shoulder causing a <a href="/clavicle-fracture"
+        >mildly displaced midclavicular fracture</a
+      >.
+    </p>
   </SingleArticle>
 </BaseLayout>

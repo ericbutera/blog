@@ -2,10 +2,10 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ArticleGallery from "../components/ArticleGallery.astro";
 import BodyBatteryChart from "../components/BodyBatteryChart.astro";
+import FontAwesomeIcon from "../components/FontAwesomeIcon.astro";
 import SleepScoreChart from "../components/SleepScoreChart.astro";
 import Timeline from "../components/Timeline.astro";
 import TimelineItem from "../components/TimelineItem.astro";
-import { icon } from "@fortawesome/fontawesome-svg-core";
 import { faStrava } from "@fortawesome/free-brands-svg-icons";
 import {
   faBed,
@@ -30,14 +30,6 @@ const { post, draftRedirect } = getPostPage(metadata, Astro.redirect);
 if (draftRedirect) {
   return draftRedirect;
 }
-
-const stravaIcon = icon(faStrava).html.join("");
-const hospitalIcon = icon(faHospital).html.join("");
-const xrayIcon = icon(faXRay).html.join("");
-const robotIcon = icon(faRobot).html.join("");
-const bedIcon = icon(faBed).html.join("");
-const officeIcon = icon(faClinicMedical).html.join("");
-const raceIcon = icon(faBiking).html.join("");
 ---
 
 <BaseLayout title={formatPageTitle(post)}>
@@ -73,7 +65,7 @@ const raceIcon = icon(faBiking).html.join("");
         datetime="2026-08-29"
         title="Initial Fracture"
         isFirst
-        iconHtml={hospitalIcon}
+        icon={faHospital}
       >
         Over the bars (OTB) crash. Tried to avoid a trail obstacle by lifting my
         rear wheel off the ground. Best guess is between the slope of the hill,
@@ -87,7 +79,7 @@ const raceIcon = icon(faBiking).html.join("");
             href="https://www.strava.com/activities/19953738369"
             target="_blank"
           >
-            <span class="strava-link-icon" set:html={stravaIcon} />
+            <FontAwesomeIcon icon={faStrava} class="strava-link-icon" />
             view ride
           </a>
         </p>
@@ -97,7 +89,7 @@ const raceIcon = icon(faBiking).html.join("");
         datetime="2026-09-14"
         title="Follow-up X-ray"
         side="end"
-        iconHtml={xrayIcon}
+        icon={faXRay}
       >
         <p>
           Checked healing progress. The gap had widened. Doc said it would
@@ -117,7 +109,7 @@ const raceIcon = icon(faBiking).html.join("");
         date="September 15, 5:30am"
         datetime="2026-09-15T05:30"
         title="Surgery"
-        iconHtml={robotIcon}
+        icon={faRobot}
       >
         Hardware added. One interesting thing is the bone didn't hurt whatsoever
         after surgery. My shoulder however, felt like my muscle had been ripped
@@ -129,7 +121,7 @@ const raceIcon = icon(faBiking).html.join("");
         datetime="2026-09-19T07:30"
         title="Marji"
         side="end"
-        iconHtml={raceIcon}
+        icon={faBiking}
       >
         <p>
           Marji race day! Wish I could have been there. Jorden Wakeley won on a
@@ -140,7 +132,7 @@ const raceIcon = icon(faBiking).html.join("");
         date="September 20, 5:30am"
         datetime="2026-09-20T05:30"
         title="Recovery"
-        iconHtml={bedIcon}
+        icon={faBed}
       >
         <p>
           I am still waking up multiple times a night in pain. Yesterday was the
@@ -155,16 +147,20 @@ const raceIcon = icon(faBiking).html.join("");
         datetime="2026-09-29"
         title="Surgery 2 week follow-up"
         side="end"
-        iconHtml={officeIcon}
+        icon={faClinicMedical}
       >
-        upcoming post-surgery 2 week follow up
+        <p>
+          Had my two week follow up appointment this morning. I am still
+          restricted from lifting anything over 2 lbs. I can start Physical
+          Therapy Oct 13.
+        </p>
       </TimelineItem>
       <TimelineItem
         date="October 13"
         datetime="2026-10-13"
         title="Surgery 4 week follow-up"
         isLast
-        iconHtml={officeIcon}
+        icon={faClinicMedical}
       >
         upcoming post-surgery 4 week follow up
       </TimelineItem>

@@ -1,0 +1,24 @@
+---
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import { iconHtml } from "../lib/icons";
+
+interface Props {
+  icon: IconDefinition;
+  class?: string;
+  label?: string;
+}
+
+const {
+  icon: iconDefinition,
+  class: className,
+  label,
+} = Astro.props;
+---
+
+<span
+  class={className}
+  role={label ? "img" : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : "true"}
+  set:html={iconHtml(iconDefinition)}
+/>

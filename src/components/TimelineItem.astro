@@ -1,4 +1,7 @@
 ---
+import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import FontAwesomeIcon from "./FontAwesomeIcon.astro";
+
 interface Props {
   date: string;
   datetime: string;
@@ -6,7 +9,7 @@ interface Props {
   side?: "start" | "end";
   isFirst?: boolean;
   isLast?: boolean;
-  iconHtml?: string;
+  icon?: IconDefinition;
 }
 
 const {
@@ -16,7 +19,7 @@ const {
   side = 'start',
   isFirst = false,
   isLast = false,
-  iconHtml,
+  icon,
 } = Astro.props;
 ---
 
@@ -24,8 +27,8 @@ const {
   {!isFirst && <hr />}
   <div class="timeline-middle" aria-hidden="true">
     {
-      iconHtml ? (
-        <span class="timeline-icon" set:html={iconHtml} />
+      icon ? (
+        <FontAwesomeIcon icon={icon} class="timeline-icon" />
       ) : (
         <svg viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5">
           <path
